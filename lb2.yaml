@@ -1,0 +1,52 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: lb-deploy
+  labels:
+    app : myapp1  
+    env: prod
+    owner: baz
+spec:
+  replicas: 3
+  selector:
+    matchLabels:  
+     project: bazprod
+  template: 
+    metadata:
+      labels: 
+        project: bazprod # servie will look for those PODs labels
+    spec:
+       containers:
+       - name: bazcont
+         image: nginx:latest
+         ports:
+          - containerPort: 80
+
+       - name: tomcat-cont1
+         image: tomcat:latest
+         ports:
+           - containerPort: 8080
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lb1-service-multipods
+  labels:
+    env: prod
+    owner: baz
+spec:
+  type: LoadBalancer
+  selector:
+    project: bazprod # selecting PODS with those labels
+  ports:
+     - name: nginx1-listener1
+       protocol  : TCP
+       port      : 80  # port on Loadbalancer
+       targetPort: 80  # port on PODS 
+
+     - name: tomcat-listener2
+       protocol: TCP
+       port: 8888
+       targetPort: 8080   

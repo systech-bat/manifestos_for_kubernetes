@@ -1,0 +1,43 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: autoscale
+  labels:
+    app : myapp1
+    env: prod
+    owner: baz
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+     project: massad
+  template:
+   metadata:
+    labels:
+      project: massad
+   spec:
+    containers:
+     - name: massad-web
+       image: tomcat:latest
+       ports:
+        - containerPort: 80
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: autoscale-deploy
+spec:
+    scaleTargetRef:
+    apiVersion: apps/v2
+    kind: Deployment
+    name: autoscale
+   minReplicas: 2
+   maxReplicas: 5
+   metrics:
+  - type: Resource
+    name: cpu
+    targetAverageUtilization: 70
+  - type: Resource
+   name: memory
+  targetAverageUtilization: 80

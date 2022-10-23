@@ -1,0 +1,17 @@
+---
+apiVersion:  autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: my-auto-scaling1
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v2
+    kind: Deployment
+    name: lb-deploy
+  minReplicas: 3
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targerAverageUtilization: 70

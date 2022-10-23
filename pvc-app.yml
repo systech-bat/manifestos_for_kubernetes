@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginxpvc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginxpvc
+  template:
+      metadata:
+        name: nginxpvc
+        labels: 
+          app: nginxpvc
+      spec:
+        containers:
+        - env:
+          - name: app
+            value: "1"
+          image: nginx
+          name: nginxpvc
+          volumeMounts:
+            - mountPath: /data
+              name: volume-data
+        volumes:
+        - name: volume-data
+          persistentVolumeClaim:
+            claimName: mongodb-pvc 

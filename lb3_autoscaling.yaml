@@ -1,0 +1,69 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: lb-deploy
+  labels:
+    app : autoscaling-app1  
+    env: prod
+    owner: baz
+spec:
+  selector:
+    matchLabels:  
+     project: bazprod
+  template: 
+    metadata:
+      labels: 
+        project: bazprod # servie will look for those PODs labels
+    spec:
+       containers:
+       - name: bazcont
+         image: nginx:latest
+         ports:
+          - containerPort: 80
+
+
+---
+apiVersion:  autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: my-auto-scaling1
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v2
+    kind: Deployment
+    name: lb-deploy
+  minReplicas: 3
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+      resource:
+        name: cpu
+        targerAverageUtilization: 70
+   - type: Resource
+       resourse:
+        name: memory
+        targetAverageUtilization: 80
+
+
+
+
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lb1-service
+  labels:
+    env: prod
+    owner: baz
+spec:
+  type: LoadBalancer
+  selector:
+    project: bazprod # selecting PODS with those labels
+  ports:
+     - name: app-listener1
+       protocol  : TCP
+       port      : 80  # port on Loadbalancer
+       targetPort: 80  # port on PODS 

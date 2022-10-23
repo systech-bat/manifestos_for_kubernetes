@@ -1,0 +1,21 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: deploy2
+  labels:
+    app : myapp1  
+spec:
+  selector:
+    matchLabels: 
+     project: kgb
+  template: 
+   metadata:
+    labels: 
+      project: kgb
+   spec:
+    containers:
+     - name: kgb-web
+       image: nginx:latest
+       ports:
+        - containerPort: 80
+
